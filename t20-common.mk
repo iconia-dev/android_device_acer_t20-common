@@ -32,7 +32,11 @@ PRODUCT_PROPERTY_OVERRIDES := \
 PRODUCT_CHARACTERISTICS := tablet
 
 PRODUCT_PACKAGES += \
-    audio.primary.tegra\
+    com.android.future.usb.accessory \
+    audio.a2dp.default \
+    libaudioutils \
+    libtinyalsa \
+    audio.primary.tegra
 
 # Hardware permissions
 PRODUCT_COPY_FILES := \
