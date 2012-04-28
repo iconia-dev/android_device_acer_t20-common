@@ -56,7 +56,6 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/prebuilt/etc/gps/gpsconfig.xml:system/etc/gps/gpsconfig.xml \
     $(LOCAL_PATH)/prebuilt/etc/bluetooth/main.conf:system/etc/bluetooth/main.conf \
     $(LOCAL_PATH)/prebuilt/etc/wifi/bcmdhd.cal:system/etc/wifi/bcmdhd.cal
-    $(LOCAL_PATH)/prebuilt/usr/idc/panjit_touch.idc:system/usr/idc/panjit_touch.idc
 
 # Alsa configs
 PRODUCT_COPY_FILES += \
