@@ -129,10 +129,10 @@
 #define RESAMPLER_BUFFER_SIZE (4 * RESAMPLER_BUFFER_FRAMES)
 
 /* product-specific defines */
-#define PRODUCT_DEVICE_PROPERTY     "ro.product.device"
-#define PRODUCT_DEVICE_PICASSO      "picasso"
-#define PRODUCT_DEVICE_PICASSO_E      "picasso_e"
-#define PRODUCT_DEVICE_VANGOGH      "vangogh"
+#define PRODUCT_BOARD_PROPERTY     "ro.product.board"
+#define PRODUCT_BOARD_PICASSO      "picasso"
+#define PRODUCT_BOARD_PICASSO_E    "picasso_e"
+#define PRODUCT_BOARD_VANGOGH      "vangogh"
 
 enum supported_boards {
     ACER_PICASSO,
@@ -401,23 +401,23 @@ static int get_boardtype(struct wm8903_audio_device *adev)
 
     LOGFUNC("%s(%p)", __FUNCTION__, adev);
 
-    property_get(PRODUCT_DEVICE_PROPERTY, board, "UNKNOWN");
+    property_get(PRODUCT_BOARD_PROPERTY, board, "UNKNOWN");
     if(!strcmp(board, "UNKNOWN")) {
          return -ENODEV;
     }
 
     /* return true if the property matches the given value */
-    if(!strcmp(board, PRODUCT_DEVICE_PICASSO)) {
+    if(!strcmp(board, PRODUCT_BOARD_PICASSO)) {
             adev->board_type = ACER_PICASSO;
           /*true on devices that must use sidetone capture */
             adev->sidetone_capture = 1;
     } 
-    else if(!strcmp(board, PRODUCT_DEVICE_PICASSO_E)) {
+    else if(!strcmp(board, PRODUCT_BOARD_PICASSO_E)) {
             adev->board_type = ACER_PICASSO_E;
           /*true on devices that must use sidetone capture */
             adev->sidetone_capture = 1;
     }
-    else if(!strcmp(board, PRODUCT_DEVICE_VANGOGH)) {
+    else if(!strcmp(board, PRODUCT_BOARD_VANGOGH)) {
             adev->board_type = ACER_VANGOGH;
           /*true on devices that must use sidetone capture */
             adev->sidetone_capture = 1;
