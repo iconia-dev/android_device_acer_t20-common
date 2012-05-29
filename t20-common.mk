@@ -29,6 +29,12 @@ PRODUCT_PROPERTY_OVERRIDES := \
     dalvik.vm.heapsize=256m \
     persist.sys.usb.config=mtp,adb
 
+ifneq ($(filter $(CM_BUILD),a100 a200 a500),)
+    PRODUCT_PROPERTY_OVERRIDES += ro.dinfo.radio=Wifi
+else
+    PRODUCT_PROPERTY_OVERRIDES += ro.dinfo.radio=3G
+endif
+
 PRODUCT_CHARACTERISTICS := tablet
 
 PRODUCT_PACKAGES += \
