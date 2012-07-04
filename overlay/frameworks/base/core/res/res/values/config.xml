@@ -21,7 +21,11 @@
      for different hardware and product builds. -->
 <resources>
 
-<!-- True will enable the electron beam screen-off animation. -->
-<bool name="config_screenOffAnimation">false</bool>
+    <string name="config_networkLocationProvider">com.google.android.location.NetworkLocationProvider</string>
+
+    <string name="config_geocodeProvider">com.google.android.location.GeocodeProvider</string>
+
+    <!-- True will enable the electron beam screen-off animation. -->
+    <bool name="config_screenOffAnimation">false</bool>
 
 </resources>
