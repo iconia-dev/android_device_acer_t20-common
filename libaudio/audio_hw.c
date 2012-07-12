@@ -346,7 +346,7 @@ static void remove_channels_from_buf(struct buffer_remix *data, void *buf, size_
     out_frame = data->out_chans * samp_size;
 
     if (out_frame >= in_frame) {
-        LOGE("BUG: remove_channels_from_buf() can not add channels to a buffer.\n");
+        ALOGE("BUG: remove_channels_from_buf() can not add channels to a buffer.\n");
         return;
     }
 
@@ -378,14 +378,14 @@ static void setup_stereo_to_mono_input_remix(struct acer_stream_in *in)
         br->in_chans = 2;
         br->out_chans = 1;
     } else
-        LOGE("Could not allocate memory for struct buffer_remix\n");
+        ALOGE("Could not allocate memory for struct buffer_remix\n");
 
     if (in->buffer) {
         size_t chans = (br->in_chans > br->out_chans) ? br->in_chans : br->out_chans;
         free(in->buffer);
         in->buffer = malloc(in->config.period_size * br->sample_size * chans);
         if (!in->buffer)
-            LOGE("Could not reallocate memory for input buffer\n");
+            ALOGE("Could not reallocate memory for input buffer\n");
     }
 
     if (in->remix_at_driver)
@@ -425,7 +425,7 @@ static int get_boardtype(struct wm8903_audio_device *adev)
     else 
         return -EINVAL;
 
-    LOGI("boardtype used: %s(%d)", board, adev->board_type);
+    ALOGI("boardtype used: %s(%d)", board, adev->board_type);
 
     return 0;
 }
@@ -469,7 +469,7 @@ static int set_route_by_array(struct mixer *mixer, struct route_setting *route,
 
 static int start_call(struct wm8903_audio_device *adev)
 {
-    LOGE("Opening modem PCMs");
+    ALOGE("Opening modem PCMs");
     LOGFUNC("%s(%p)", __FUNCTION__, adev);
 #if 0
 #ifdef USE_RIL
@@ -512,7 +512,7 @@ err_open_dl:
 
 static void end_call(struct wm8903_audio_device *adev)
 {
-    LOGE("Closing modem PCMs");
+    ALOGE("Closing modem PCMs");
     LOGFUNC("%s(%p)", __FUNCTION__, adev);
 
     pcm_stop(adev->pcm_modem_dl);
@@ -525,7 +525,7 @@ static void end_call(struct wm8903_audio_device *adev)
 
 static void set_eq_filter(struct wm8903_audio_device *adev)
 {
-    LOGI("Function \"%s\" is not yet implemented", __FUNCTION__);
+    ALOGI("Function \"%s\" is not yet implemented", __FUNCTION__);
 }
 
 #ifdef USE_RIL
@@ -544,7 +544,7 @@ void audio_set_wb_amr_callback(void *data, int enable)
      * mutex needs to be used. */
     trylock = pthread_mutex_trylock(&adev->lock);
     if (EDEADLK == trylock)
-        LOGV("%s: WB AMR callback calls in a deadlock situation", __FUNCTION__);
+        ALOGV("%s: WB AMR callback calls in a deadlock situation", __FUNCTION__);
     if (EBUSY == trylock) {
         pthread_mutex_lock(&adev->lock);
     }
@@ -659,10 +659,10 @@ static void set_input_volumes(struct wm8903_audio_device *adev,int main_mic_on,
 #endif
     for (channel = 0; channel < 2; channel++) {
         if(adev->board_type == ACER_PICASSO || adev->board_type == ACER_PICASSO_E || adev->board_type == ACER_VANGOGH) {
-            LOGD("New value (%d) of input volume will be applied for channel %d", volume, channel);
+            ALOGD("New value (%d) of input volume will be applied for channel %d", volume, channel);
             mixer_ctl_set_value(adev->mixer_ctls.dcapture_volume, channel, volume);
         } else {
-            LOGW("[%s:%d] Unsupported board type %d",
+            ALOGW("[%s:%d] Unsupported board type %d",
                   __FILE__, __LINE__, adev->board_type);
         }
     }
@@ -712,7 +712,7 @@ static void select_mode(struct wm8903_audio_device *adev)
     LOGFUNC("%s(%p)", __FUNCTION__, adev);
 
     if (adev->mode == AUDIO_MODE_IN_CALL) {
-        LOGE("Entering IN_CALL state, in_call=%d", adev->in_call);
+        ALOGE("Entering IN_CALL state, in_call=%d", adev->in_call);
         if (!adev->in_call) {
             force_all_standby(adev);
             /* force earpiece route for in call state if speaker is the
@@ -739,7 +739,7 @@ static void select_mode(struct wm8903_audio_device *adev)
             adev->in_call = 1;
         }
     } else {
-        LOGE("Leaving IN_CALL state, in_call=%d, mode=%d",
+        ALOGE("Leaving IN_CALL state, in_call=%d, mode=%d",
              adev->in_call, adev->mode);
         if (adev->in_call) {
             adev->in_call = 0;
@@ -771,7 +771,7 @@ static void select_output_device(struct wm8903_audio_device *adev)
     speaker_on = adev->devices & AUDIO_DEVICE_OUT_SPEAKER;
     earpiece_on = adev->devices & AUDIO_DEVICE_OUT_EARPIECE;
 
-    LOGI("[%s]\n* headset_on = %s\n* headphone_on = %s\n* speaker_on = %s\n"
+    ALOGI("[%s]\n* headset_on = %s\n* headphone_on = %s\n* speaker_on = %s\n"
          "* earpiece_on = %s", __FUNCTION__,
          headset_on > 0 ? "On" : "Off",
          headphone_on > 0 ? "On" : "Off",
@@ -839,12 +839,12 @@ static void select_output_device(struct wm8903_audio_device *adev)
         }
 
         if (headset_on) {
-            LOGW("[%s] Routing microphone to headset is yet not implemented", __FUNCTION__);
+            ALOGW("[%s] Routing microphone to headset is yet not implemented", __FUNCTION__);
         } else if (headphone_on || earpiece_on || speaker_on) {
             mixer_ctl_set_enum_by_string(adev->mixer_ctls.int_mic_switch, "On");
         }
         else {
-            LOGE("[%s:%d] Unsupported routing mode", __FILE__, __LINE__);
+            ALOGE("[%s:%d] Unsupported routing mode", __FILE__, __LINE__);
         }
 
         /* enable sidetone mixer capture if needed */
@@ -865,7 +865,7 @@ static void select_input_device(struct wm8903_audio_device *adev)
 #ifndef LOG_STOP_SPAM
     LOGFUNC("%s(%p)", __FUNCTION__, adev);
 #endif
-    LOGD("[%s]\n* headset_on = %s\n* builtin_mic_on = %s", __FUNCTION__,
+    ALOGD("[%s]\n* headset_on = %s\n* builtin_mic_on = %s", __FUNCTION__,
          headset_on > 0 ? "On" : "Off",
          builtin_mic_on > 0 ? "On" : "Off");
 
@@ -884,7 +884,7 @@ static void select_input_device(struct wm8903_audio_device *adev)
         mixer_ctl_set_enum_by_string(adev->mixer_ctls.lin_inverting_mux, MIXER_VALUE_MIC_INTERNAL_LEFT);
         mixer_ctl_set_enum_by_string(adev->mixer_ctls.rin_inverting_mux, MIXER_VALUE_MIC_INTERNAL_RIGHT);
     } else {
-        LOGE("[%s] Routing for unknown input device can't be configured", __FUNCTION__);
+        ALOGE("[%s] Routing for unknown input device can't be configured", __FUNCTION__);
     }
 
 #warning Flag "hw_is_stereo_only" should be investigated
@@ -946,20 +946,20 @@ static int start_output_stream(struct acer_stream_out *out)
     }
 #endif
 
-    LOGD("[%s] card = %d port = %d", __FUNCTION__, card, port);
-    LOGI("channels = %d", out->config.channels);
-    LOGI("rate = %d", out->config.rate);
-    LOGI("period_size = %d", out->config.period_size);
-    LOGI("period_count = %d", out->config.period_count);
-    LOGI("bits = %d", (out->config.format == PCM_FORMAT_S32_LE) ? 32 : (out->config.format == PCM_FORMAT_S16_LE) ? 16 : -1 );
-    LOGI("start_threshold = %d", out->config.start_threshold);
-    LOGI("stop_threshold = %d", out->config.stop_threshold);
-    LOGI("silence_threshold = %d", out->config.silence_threshold);
+    ALOGD("[%s] card = %d port = %d", __FUNCTION__, card, port);
+    ALOGI("channels = %d", out->config.channels);
+    ALOGI("rate = %d", out->config.rate);
+    ALOGI("period_size = %d", out->config.period_size);
+    ALOGI("period_count = %d", out->config.period_count);
+    ALOGI("bits = %d", (out->config.format == PCM_FORMAT_S32_LE) ? 32 : (out->config.format == PCM_FORMAT_S16_LE) ? 16 : -1 );
+    ALOGI("start_threshold = %d", out->config.start_threshold);
+    ALOGI("stop_threshold = %d", out->config.stop_threshold);
+    ALOGI("silence_threshold = %d", out->config.silence_threshold);
 
     out->pcm = pcm_open(card, port, PCM_OUT | PCM_MMAP, &out->config);
 
     if (!pcm_is_ready(out->pcm)) {
-        LOGE("cannot open pcm_out driver: %s", pcm_get_error(out->pcm));
+        ALOGE("cannot open pcm_out driver: %s", pcm_get_error(out->pcm));
         pcm_close(out->pcm);
         adev->active_output = NULL;
         return -ENOMEM;
@@ -1100,7 +1100,7 @@ static int get_playback_delay(struct acer_stream_out *out,
         buffer->time_stamp.tv_sec  = 0;
         buffer->time_stamp.tv_nsec = 0;
         buffer->delay_ns           = 0;
-        LOGV("get_playback_delay(): pcm_get_htimestamp error,"
+        ALOGV("get_playback_delay(): pcm_get_htimestamp error,"
                 "setting playbackTimestamp to 0");
         return status;
     }
@@ -1190,7 +1190,7 @@ static int do_output_standby(struct acer_stream_out *out)
             set_route_by_array(adev->mixer, hs_output, 0);
             set_route_by_array(adev->mixer, hf_output, 0);
 #else
-            LOGW("[%s] Headphone/Headset should be suspended in case if not in call mode", __FUNCTION__);
+            ALOGW("[%s] Headphone/Headset should be suspended in case if not in call mode", __FUNCTION__);
 #endif
         }
 
@@ -1374,7 +1374,7 @@ do_over:
     /* only use resampler if required */
     if (out->config.rate != DEFAULT_SAMPLING_RATE) {
         if (!out->resampler) {
-            LOGV("Output sample rate different with default");
+            ALOGV("Output sample rate different with default");
             ret = create_resampler(DEFAULT_SAMPLING_RATE,
                     out->config.rate,
                     2,
@@ -1444,7 +1444,7 @@ exit:
 
     if (ret == -EPIPE) {
         /* Recover from an underrun */
-        LOGE("XRUN detected");
+        ALOGE("XRUN detected");
         pthread_mutex_lock(&adev->lock);
         pthread_mutex_lock(&out->lock);
         do_output_standby(out);
@@ -1523,7 +1523,7 @@ static int start_input_stream(struct acer_stream_in *in)
         set_route_by_array(adev->mixer, vx_rec_dl, vx_rec_dl_on);
         adev->vx_rec_on = true;
 #else
-        LOGW("[%s] Routing of input stream for call mode not defined", __FUNCTION__);
+        ALOGW("[%s] Routing of input stream for call mode not defined", __FUNCTION__);
 #endif
     }
 
@@ -1556,7 +1556,7 @@ static int start_input_stream(struct acer_stream_in *in)
     }
 #endif
 
-    LOGD("[%s] Input properties:\n* channels = %d\n* rate = %d\n* period_size = %d\n"
+    ALOGD("[%s] Input properties:\n* channels = %d\n* rate = %d\n* period_size = %d\n"
          "* period_count = %d\n* bits = %d\n* start_threshold = %d\n* stop_threshold = %d\n* silence_threshold = %d",
          __FUNCTION__,
          in->config.channels,
@@ -1572,7 +1572,7 @@ static int start_input_stream(struct acer_stream_in *in)
     if (in->remix_at_driver)
         in->config.channels = in->remix_at_driver->out_chans;
     if (!pcm_is_ready(in->pcm)) {
-        LOGE("cannot open pcm_in driver: %s", pcm_get_error(in->pcm));
+        ALOGE("cannot open pcm_in driver: %s", pcm_get_error(in->pcm));
         pcm_close(in->pcm);
         adev->active_input = NULL;
         return -ENOMEM;
@@ -1675,7 +1675,7 @@ static int do_input_standby(struct acer_stream_in *in)
             set_route_by_array(adev->mixer, vx_rec_dl, 0);
             set_route_by_array(adev->mixer, vx_rec_default, 0);
 #else
-            LOGW("[%s] Turning-off routing to input device in call mode not implemented", __FUNCTION__);
+            ALOGW("[%s] Turning-off routing to input device in call mode not implemented", __FUNCTION__);
 #endif
         }
 
@@ -1816,7 +1816,7 @@ static void get_capture_delay(struct acer_stream_in *in,
         buffer->time_stamp.tv_sec  = 0;
         buffer->time_stamp.tv_nsec = 0;
         buffer->delay_ns           = 0;
-        LOGW("read get_capture_delay(): pcm_htimestamp error");
+        ALOGW("read get_capture_delay(): pcm_htimestamp error");
         return;
     }
 
@@ -1837,7 +1837,7 @@ static void get_capture_delay(struct acer_stream_in *in,
 
     buffer->time_stamp = tstamp;
     buffer->delay_ns   = delay_ns;
-    LOGV("get_capture_delay time_stamp = [%ld].[%ld], delay_ns: [%d],"
+    ALOGV("get_capture_delay time_stamp = [%ld].[%ld], delay_ns: [%d],"
          " kernel_delay:[%ld], buf_delay:[%ld], rsmp_delay:[%ld], kernel_frames:[%d], "
          "in->frames_in:[%d], in->proc_frames_in:[%d], frames:[%d]",
          buffer->time_stamp.tv_sec , buffer->time_stamp.tv_nsec, buffer->delay_ns,
@@ -1853,7 +1853,7 @@ static int32_t update_echo_reference(struct acer_stream_in *in, size_t frames)
 
     LOGFUNC("%s(%p, %ul)", __FUNCTION__, in, frames);
 
-    LOGV("update_echo_reference, frames = [%d], in->ref_frames_in = [%d],  "
+    ALOGV("update_echo_reference, frames = [%d], in->ref_frames_in = [%d],  "
           "b.frame_count = [%d]",
          frames, in->ref_frames_in, frames - in->ref_frames_in);
     if (in->ref_frames_in < frames) {
@@ -1872,12 +1872,12 @@ static int32_t update_echo_reference(struct acer_stream_in *in, size_t frames)
         if (in->echo_reference->read(in->echo_reference, &b) == 0)
         {
             in->ref_frames_in += b.frame_count;
-            LOGV("update_echo_reference: in->ref_frames_in:[%d], "
+            ALOGV("update_echo_reference: in->ref_frames_in:[%d], "
                     "in->ref_buf_size:[%d], frames:[%d], b.frame_count:[%d]",
                  in->ref_frames_in, in->ref_buf_size, frames, b.frame_count);
         }
     } else
-        LOGW("update_echo_reference: NOT enough frames to read ref buffer");
+        ALOGW("update_echo_reference: NOT enough frames to read ref buffer");
     return b.delay_ns;
 }
 
@@ -1987,7 +1987,7 @@ static int get_next_buffer(struct resampler_buffer_provider *buffer_provider,
                                    (void*)in->buffer,
                                    in->config.period_size * hw_frame_size);
         if (in->read_status != 0) {
-            LOGE("get_next_buffer() pcm_read error %d", in->read_status);
+            ALOGE("get_next_buffer() pcm_read error %d", in->read_status);
             buffer->raw = NULL;
             buffer->frame_count = 0;
             return in->read_status;
@@ -2092,7 +2092,7 @@ static ssize_t process_frames(struct acer_stream_in *in, void* buffer, ssize_t f
                 in->proc_buf = (int16_t *)realloc(in->proc_buf,
                                          in->proc_buf_size *
                                              in->config.channels * sizeof(int16_t));
-                LOGV("process_frames(): in->proc_buf %p size extended to %d frames",
+                ALOGV("process_frames(): in->proc_buf %p size extended to %d frames",
                      in->proc_buf, in->proc_buf_size);
             }
             frames_rd = read_frames(in,
@@ -2749,7 +2749,7 @@ static int adev_open(const hw_module_t* module, const char* name,
     adev->mixer = mixer_open(0);
     if (!adev->mixer) {
         free(adev);
-        LOGE("Unable to open the mixer, aborting.");
+        ALOGE("Unable to open the mixer, aborting.");
         return -EINVAL;
     }
 
@@ -2782,7 +2782,7 @@ static int adev_open(const hw_module_t* module, const char* name,
         !adev->mixer_ctls.lin_pga_switch || !adev->mixer_ctls.rin_pga_switch) {
         mixer_close(adev->mixer);
         free(adev);
-        LOGE("Unable to locate all mixer controls, aborting.");
+        ALOGE("Unable to locate all mixer controls, aborting.");
         return -EINVAL;
     }
 
@@ -2802,7 +2802,7 @@ static int adev_open(const hw_module_t* module, const char* name,
 #if 0
     set_route_by_array(adev->mixer, defaults, 1);
 #else
-    LOGW("[%s] Default properties not defined", __FUNCTION__);
+    ALOGW("[%s] Default properties not defined", __FUNCTION__);
 #endif
     adev->mode = AUDIO_MODE_NORMAL;
     adev->devices = AUDIO_DEVICE_OUT_SPEAKER | AUDIO_DEVICE_IN_BUILTIN_MIC;
@@ -2816,7 +2816,7 @@ static int adev_open(const hw_module_t* module, const char* name,
         pthread_mutex_unlock(&adev->lock);
         mixer_close(adev->mixer);
         free(adev);
-        LOGE("Unsupported boardtype, aborting.");
+        ALOGE("Unsupported boardtype, aborting.");
         return -EINVAL;
     }
 
